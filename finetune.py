@@ -12,7 +12,7 @@ import data
 import model
 import os
 
-from utils import batchify, get_batch, repackage_hidden, create_exp_dir, save_checkpoint, model_load
+from utils import batchify, get_batch, repackage_hidden, create_exp_dir, save_checkpoint
 
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank/WikiText2 RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='./penn/',
@@ -113,7 +113,7 @@ if torch.cuda.is_available():
 
 corpus = data.Corpus(args.data)
 
-eval_batch_size = 1
+eval_batch_size = 10
 test_batch_size = 1
 train_data = batchify(corpus.train, args.batch_size, args)
 val_data = batchify(corpus.valid, eval_batch_size, args)
@@ -123,14 +123,11 @@ test_data = batchify(corpus.test, test_batch_size, args)
 # Build the model
 ###############################################################################
 
-
-
 ntokens = len(corpus.dictionary)
 if args.continue_train:
-    model = model_load(os.path.join(args.save, 'finetune_model.pt'))
+    model = torch.load(os.path.join(args.save, 'finetune_model.pt'))
 else:
-    model = model_load(os.path.join(args.save, 'model.pt'))
-    
+    model = torch.load(os.path.join(args.save, 'model.pt'))
 if args.cuda:
     if args.single_gpu:
         parallel_model = model.cuda()
@@ -247,7 +244,7 @@ try:
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
         train()
-        if 't0' in optimizer.param_groups[0]: # if ASGD
+        if 't0' in optimizer.param_groups[0]:
             tmp = {}
             for prm in model.parameters():
                 tmp[prm] = prm.data.clone()
@@ -282,7 +279,7 @@ except KeyboardInterrupt:
     logging('Exiting from training early')
 
 # Load the best saved model.
-model = model_load(os.path.join(args.save, 'finetune_model.pt'))
+model = torch.load(os.path.join(args.save, 'finetune_model.pt'))
 parallel_model = nn.DataParallel(model, dim=1).cuda()
     
 # Run on test data.
