@@ -231,7 +231,7 @@ def train():
 
 # Loop over epochs.
 lr = args.lr
-stored_loss = evaluate(val_data)
+stored_loss = evaluate(val_data, eval_batch_size)
 best_val_loss = []
 # At any point you can hit Ctrl + C to break out of training early.
 try:
@@ -251,7 +251,7 @@ try:
                 if prm in optimizer.state.keys(): 
                     prm.data = optimizer.state[prm]['ax'].clone()
 
-            val_loss2 = evaluate(val_data)
+            val_loss2 = evaluate(val_data, eval_batch_size)
             logging('-' * 89)
             logging('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
                     'valid ppl {:8.2f}'.format(epoch, (time.time() - epoch_start_time),
