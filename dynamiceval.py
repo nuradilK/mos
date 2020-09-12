@@ -90,10 +90,8 @@ def gradstat():
     hidden = model.init_hidden(args.batch_size)
     batch, i = 0, 0
 
-    PARAMS = {}
     for param in model.parameters():
         param.MS = 0*param.data
-        PARAMS[param] = 1
 
     while i < train_data.size(0) - 1 - 1:
         seq_len = args.bptt
@@ -111,12 +109,9 @@ def gradstat():
                 
         loss.backward()
         
-        cnt = 0
         for param in model.parameters():
-            cnt += 1
-            if param not in PARAMS:
-                param.MS = 0*param.data
-                PARAMS[param] = 1
+            if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
+                continue
             if param.grad != None:
                 param.MS = param.MS + param.grad.data*param.grad.data
                 
