@@ -128,14 +128,18 @@ def gradstat():
     gsum = 0
 
     for param in model.parameters():
-        if args.ms:
-            param.MS = torch.sqrt(param.MS/batch)
-        else:
-            param.MS = torch.sqrt(param.MS)
-        gsum+=torch.mean(param.MS)
+    	if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
+    		continue
+    	if args.ms:
+    		param.MS = torch.sqrt(param.MS/batch)
+    	else:
+        	param.MS = torch.sqrt(param.MS)
+    	gsum+=torch.mean(param.MS)
 
     for param in model.parameters():
-        param.decrate = param.MS/gsum
+    	if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
+    		continue
+    	param.decrate = param.MS/gsum
         
 
 def evaluate():
