@@ -128,18 +128,18 @@ def gradstat():
     gsum = 0
 
     for param in model.parameters():
-    	if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
-    		continue
-    	if args.ms:
-    		param.MS = torch.sqrt(param.MS/batch)
-    	else:
-        	param.MS = torch.sqrt(param.MS)
-    	gsum+=torch.mean(param.MS)
+        if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
+            continue
+        if args.ms:
+            param.MS = torch.sqrt(param.MS/batch)
+        else:
+            param.MS = torch.sqrt(param.MS)
+        gsum+=torch.mean(param.MS)
 
     for param in model.parameters():
-    	if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
-    		continue
-    	param.decrate = param.MS/gsum
+        if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
+            continue
+        param.decrate = param.MS/gsum
         
 
 def evaluate():
@@ -148,6 +148,8 @@ def evaluate():
     #otherwise scaled decay rates can be greater than 1
     #would cause decay updates to overshoot
     for param in model.parameters():
+        if param.size() == torch.Size([4600, 1150]) or param.size() == torch.Size([2600, 650]):
+            continue
         if args.cuda:
             decratenp = param.decrate.cpu().numpy()
             ind = np.nonzero(decratenp>(1/lamb))
@@ -185,10 +187,6 @@ def evaluate():
         hidden = repackage_hidden(hidden)
 
         model.zero_grad()
-        
-        PARAM = {}
-        for param in model.parameters():
-            PARAM[param] = 1
 
         #assumes model has atleast 2 returns, and first is output and second is hidden
         log_prob, hidden = model(data, hidden)
